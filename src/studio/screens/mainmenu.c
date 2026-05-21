@@ -195,6 +195,8 @@ static MenuOption VolumeOption =
     optionVolumeSet,
 };
 
+#if defined(BUILD_EDITORS)
+
 static s32 optionAutoSaveGet(void* data)
 {
     StudioMainMenu* main = data;
@@ -214,7 +216,6 @@ static MenuOption AutoSaveOption =
     optionAutoSaveSet,
 };
 
-#if defined(BUILD_EDITORS)
 static s32 optionTabSizeGet(void* data)
 {
     StudioMainMenu* main = data;
@@ -325,8 +326,8 @@ static const MenuItem OptionMenu[] =
     {"FULLSCREEN",      NULL,   &FullscreenOption},
     {"INTEGER SCALE",   NULL,   &IntegerScaleOption},
     {"VOLUME",          NULL,   &VolumeOption},
-    {"AUTOSAVE",        NULL,   &AutoSaveOption, "Keep carts loaded from the web"},
 #if defined(BUILD_EDITORS)
+    {"AUTOSAVE",        NULL,   &AutoSaveOption, "Keep carts loaded from the web"},
     {"EDITOR OPTIONS", showEditorMenu},
 #endif
     {"SETUP GAMEPAD",       showGamepadMenu},
@@ -439,7 +440,7 @@ static inline s32 mainMenuOffset(StudioMainMenu* menu)
     if (!studio_is_cart_loaded(menu->studio))
         return 3;
 
-    return 1;
+    return 0;
 }
 
 static void onBackFromOptionsMenu(void* data, s32 pos)
@@ -484,9 +485,9 @@ static void onSurf(void* data, s32 pos)
 
 enum MainMenu
 {
-    MainMenu_GameMenu,
     MainMenu_ResumeGame,
     MainMenu_ResetGame,
+    MainMenu_GameMenu,
 #if defined(BUILD_EDITORS)
     MainMenu_CloseGame,
 #endif
@@ -500,16 +501,16 @@ enum MainMenu
 
 static const MenuItem MainMenu[] =
 {
-    {"GAME MENU",   showGameMenu},
-    {"RESUME GAME", onResumeGame},
-    {"RESET GAME",  onResetGame},
+    {"RESUME GAME",     onResumeGame},
+    {"RESET GAME",      onResetGame},
+    {"GAME OPTIONS",    showGameMenu},
 #if defined(BUILD_EDITORS)
     {"CLOSE GAME",  onExitGame, NULL, "Press F1 to switch to editor"},
 #endif
 #if defined(BUILD_SURF)
     {"SURF",        onSurf},
 #endif
-    {"OPTIONS",     showOptionsMenu},
+    {"TIC-80 OPTIONS",     showOptionsMenu},
     {""},
     {"QUIT TIC-80", onExitStudio},
 };
@@ -554,8 +555,6 @@ static const char* const ButtonLabels[] =
 
 enum
 {
-    GamepadMenu_Index,
-    GamepadMenu_Separator,
     GamepadMenu_Gamepad0,
     GamepadMenu_Gamepad1,
     GamepadMenu_Gamepad2,
@@ -629,7 +628,7 @@ static void optionGamepadSet(void* data, s32 pos)
 
 static MenuOption GamepadOption =
 {
-    OPTION_VALUES({"1", "2", "3", "4"}),
+    OPTION_VALUES({"1", "2"}),
     optionGamepadGet,
     optionGamepadSet,
 };
@@ -653,9 +652,6 @@ static void initGamepadMenu(StudioMainMenu* main)
 {
     static const MenuItem GamepadMenu[] =
     {
-        {"GAMEPAD", NULL, &GamepadOption},
-        {""},
-
         {MappingItems[0], assignMapping},
         {MappingItems[1], assignMapping},
         {MappingItems[2], assignMapping},
